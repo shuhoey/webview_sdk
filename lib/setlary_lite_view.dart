@@ -1,35 +1,41 @@
-library webview_sdk;
+library setlary_lite;
 
+export 'src/setlary_lite.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class WebViewSdk extends StatefulWidget {
+class SetlaryLiteView extends StatefulWidget {
   final String token;
   final bool enableJavaScript;
+  final String? testUrl;
 
-  const WebViewSdk({
+  const SetlaryLiteView({
     Key? key,
     required this.token,
     this.enableJavaScript = true,
+    this.testUrl,
   }) : super(key: key);
 
   @override
-  State<WebViewSdk> createState() => _WebViewSdkState();
+  State<SetlaryLiteView> createState() => _SetlaryLiteViewState();
 }
 
-class _WebViewSdkState extends State<WebViewSdk> {
+class _SetlaryLiteViewState extends State<SetlaryLiteView> {
   late final WebViewController _controller;
 
   @override
   void initState() {
     super.initState();
     final String initialUrl =
-        'http://10.0.2.252:8000/?token=${Uri.encodeComponent(widget.token)}';
+        widget.testUrl ??
+        'https://stage-lite.setlary.my?token=${Uri.encodeComponent(widget.token)}';
 
     _controller = WebViewController()
-      ..setJavaScriptMode(widget.enableJavaScript
-          ? JavaScriptMode.unrestricted
-          : JavaScriptMode.disabled)
+      ..setJavaScriptMode(
+        widget.enableJavaScript
+            ? JavaScriptMode.unrestricted
+            : JavaScriptMode.disabled,
+      )
       ..loadRequest(Uri.parse(initialUrl));
   }
 
