@@ -1,6 +1,4 @@
-library setlary_lite;
-
-export 'src/setlary_lite.dart';
+export 'setlary_lite.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -10,11 +8,11 @@ class SetlaryLiteView extends StatefulWidget {
   final String? testUrl;
 
   const SetlaryLiteView({
-    Key? key,
+    super.key,
     required this.token,
     this.enableJavaScript = true,
     this.testUrl,
-  }) : super(key: key);
+  });
 
   @override
   State<SetlaryLiteView> createState() => _SetlaryLiteViewState();

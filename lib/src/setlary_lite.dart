@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class SetlaryLite extends StatefulWidget {
   final String url;
+  final String token;
+  final bool enableJavaScript;
 
   /// Optional: set height of the container
   final double? height;
@@ -11,11 +14,13 @@ class SetlaryLite extends StatefulWidget {
   final double? width;
 
   const SetlaryLite({
-    Key? key,
+    super.key,
     required this.url,
+    required this.token,
+    this.enableJavaScript = true,
     this.height,
     this.width,
-  }) : super(key: key);
+  });
 
   @override
   State<SetlaryLite> createState() => _SetlaryLiteState();
@@ -28,16 +33,23 @@ class _SetlaryLiteState extends State<SetlaryLite> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse(widget.url));
+      ..setJavaScriptMode(
+        widget.enableJavaScript
+            ? JavaScriptMode.unrestricted
+            : JavaScriptMode.disabled,
+      )
+      ..loadRequest(
+        Uri.parse(
+          '${widget.url}?token=?token=${Uri.encodeComponent(widget.token)}',
+        ),
+      );
   }
 
   void _navigateToWebView() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          body: WebViewWidget(controller: _controller),
-        ),
+        builder: (context) =>
+            Scaffold(body: WebViewWidget(controller: _controller)),
       ),
     );
   }
@@ -47,33 +59,13 @@ class _SetlaryLiteState extends State<SetlaryLite> {
     return GestureDetector(
       onTap: _navigateToWebView,
       child: Container(
-        height: widget.height ?? 400, // default height
-        width: widget.width ?? double.infinity,
+        height: widget.height ?? 48, // default height
+        width: widget.width ?? 48,
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(
-              'https://play-lh.googleusercontent.com/qCNdZAzu204xsA9QJVZNgnqtX9wv5Yb5kbKtXE8ZNV7DcbgE-f2IxhsBejNcwccctCKZ',
-            ),
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _navigateToWebView,
-              child: Center(
-                child: Icon(
-                  Icons.open_in_browser,
-                  color: Colors.white,
-                  size: 48,
-                ),
-              ),
-            ),
-          ),
-        ),
+        child: SvgPicture.asset('assets/logo.svg'),
       ),
     );
   }
