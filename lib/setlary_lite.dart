@@ -40,7 +40,7 @@ class _SetlaryLiteState extends State<SetlaryLite> {
       )
       ..loadRequest(
         Uri.parse(
-          '${widget.url}?token=?token=${Uri.encodeComponent(widget.token)}',
+          '${widget.url}?token=${Uri.encodeComponent(widget.token)}',
         ),
       );
   }
