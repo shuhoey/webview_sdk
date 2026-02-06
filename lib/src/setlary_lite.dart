@@ -32,21 +32,47 @@ class _SetlaryLiteState extends State<SetlaryLite> {
       ..loadRequest(Uri.parse(widget.url));
   }
 
+  void _navigateToWebView() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          body: WebViewWidget(controller: _controller),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: widget.height ?? 400, // default height
-      width: widget.width ?? double.infinity,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8), // optional styling
-        child: WebViewWidget(controller: _controller),
-      ),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(
-            'https://play-lh.googleusercontent.com/qCNdZAzu204xsA9QJVZNgnqtX9wv5Yb5kbKtXE8ZNV7DcbgE-f2IxhsBejNcwccctCKZ',
+    return GestureDetector(
+      onTap: _navigateToWebView,
+      child: Container(
+        height: widget.height ?? 400, // default height
+        width: widget.width ?? double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(
+              'https://play-lh.googleusercontent.com/qCNdZAzu204xsA9QJVZNgnqtX9wv5Yb5kbKtXE8ZNV7DcbgE-f2IxhsBejNcwccctCKZ',
+            ),
+            fit: BoxFit.cover,
           ),
-          fit: BoxFit.cover,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _navigateToWebView,
+              child: Center(
+                child: Icon(
+                  Icons.open_in_browser,
+                  color: Colors.white,
+                  size: 48,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
