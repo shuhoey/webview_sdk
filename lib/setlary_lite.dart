@@ -65,7 +65,7 @@ class _SetlaryLiteState extends State<SetlaryLite> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: SvgPicture.asset('assets/logo.svg'),
+        child: SvgPicture.asset('assets/logo.svg', package: 'setlary_lite',),
       ),
     );
   }
