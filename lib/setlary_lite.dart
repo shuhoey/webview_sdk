@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SetlaryLite extends StatefulWidget {
   final String url;
@@ -44,30 +45,68 @@ class _SetlaryLiteState extends State<SetlaryLite> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          body: InAppWebView(
-            key: UniqueKey(),
-            initialUrlRequest: URLRequest(
-              url: WebUri(
-                '${widget.url}?token=${Uri.encodeComponent(widget.token)}',
+          body: SafeArea(
+            child: InAppWebView(
+              key: UniqueKey(),
+              initialUrlRequest: URLRequest(
+                url: WebUri(
+                  '${widget.url}?token=${Uri.encodeComponent(widget.token)}',
+                ),
               ),
+              onWebViewCreated: (controller) {
+                _controller = controller;
+              },
+              initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                supportZoom: false,
+                transparentBackground: false,
+                useHybridComposition: true,
+                allowsInlineMediaPlayback: true,
+                allowFileAccess: false,
+              ),
+              onLoadResource: (controller, resource) async {
+                final resourceUrl = resource.url?.toString();
+                if (resourceUrl != null && resourceUrl.endsWith('/close')) {
+                  Navigator.of(context).pop();
+                }
+              },
+              shouldOverrideUrlLoading: (controller, navigation) async {
+                final uri = navigation.request.url;
+                if (uri == null) return NavigationActionPolicy.ALLOW;
+                String phone = uri.path.replaceAll("/", ""); // e.g. 60123456789
+
+                if (uri.host == "wa.me" || uri.scheme == "whatsapp") {
+                  Uri appUri = Uri.parse("whatsapp://send?phone=$phone");
+                  Uri webUri = Uri.parse("https://wa.me/$phone");
+
+                  // 1. Try native app first
+                  if (await canLaunchUrl(appUri)) {
+                    await launchUrl(
+                      appUri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                    return NavigationActionPolicy.CANCEL;
+                  }
+
+                  // 2. Fallback to browser WhatsApp Web
+                  await launchUrl(webUri, mode: LaunchMode.externalApplication);
+
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                if (uri.scheme == "tel") {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                if (uri.scheme == "mailto") {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                return NavigationActionPolicy.ALLOW;
+              },
             ),
-            onWebViewCreated: (controller) {
-              _controller = controller;
-            },
-            initialSettings: InAppWebViewSettings(
-              javaScriptEnabled: true,
-              supportZoom: false,
-              transparentBackground: false,
-              useHybridComposition: true,
-              allowsInlineMediaPlayback: true,
-              allowFileAccess: false,
-            ),
-            onLoadResource: (controller, resource) async {
-              final resourceUrl = resource.url?.toString();
-              if (resourceUrl != null && resourceUrl.endsWith('/close')) {
-                Navigator.of(context).pop();
-              }
-            },
           ),
         ),
       ),
